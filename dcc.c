@@ -195,54 +195,54 @@ void DCC_Command(DCC_REC *DCCData)
 	int n;
 	if((EnableServiceMode == 1) && ((DCCData->data[0] & 0b11110000) == DCC_INSTRUCTION_PACKET))
 	{
-			switch(DCCData->data[0] & 0b00001100)
+		switch(DCCData->data[0] & 0b00001100)
+		{
+			case DCC_INSTRUCTION_WRITE_BYTE:
 			{
-				case DCC_INSTRUCTION_WRITE_BYTE:
+				unsigned char Data = DCCData->data[2];
+				WriteEeprom(&Data, DCCData->data[1], 1);
+				DCC_ACK = 1;
+				Delay10KTCYx(10);
+				DCC_ACK = 0;	
+				break;	
+			}
+			case DCC_INSTRUCTION_VERIFY_BYTE:
+			{
+				unsigned char readed;
+				ReadEeprom(&readed, DCCData->data[1], 1);
+				if(DCCData->data[2] == readed)
 				{
-					unsigned char Data = DCCData->data[2];
-					WriteEeprom(&Data, DCCData->data[1], 1);
 					DCC_ACK = 1;
 					Delay10KTCYx(10);
-					DCC_ACK = 0;	
-					break;	
+					DCC_ACK = 0;
 				}
-				case DCC_INSTRUCTION_VERIFY_BYTE:
+				break;
+			}
+			case DCC_INSTRUCTION_BIT_MANIPULATION:
+			{
+				unsigned char readed;
+				unsigned char bitpos = DCCData->data[2] & 0b00000111;
+				unsigned char Bit = (DCCData->data[2] & 0b00001000) >> 3;
+				ReadEeprom(&readed, DCCData->data[1], 1);
+				if(DCCData->data[2] & 0b00010000)							//bit write NOT TESTED yet!!!
 				{
-					unsigned char readed;
-					ReadEeprom(&readed, DCCData->data[1], 1);
-					if(DCCData->data[2] == readed)
+					readed = readed & ~(1 << bitpos) | (Bit << bitpos);
+					WriteEeprom(&readed, DCCData->data[1], 1);
+					DCC_ACK = 1;
+					Delay10KTCYx(10);
+					DCC_ACK = 0;
+				}	
+				else														//bit verify
+				{
+					if(((readed >> bitpos) & 0b00000001) == Bit)
 					{
 						DCC_ACK = 1;
 						Delay10KTCYx(10);
 						DCC_ACK = 0;
 					}
-					break;
-				}
-				case DCC_INSTRUCTION_BIT_MANIPULATION:
-				{
-					unsigned char readed;
-					unsigned char bitpos = DCCData->data[2] & 0b00000111;
-					unsigned char Bit = (DCCData->data[2] & 0b00001000) >> 3;
-					ReadEeprom(&readed, DCCData->data[1], 1);
-					if(DCCData->data[2] & 0b00010000)							//bit write NOT TESTED yet!!!
-					{
-						readed = readed & ~(1 << bitpos) | (Bit << bitpos);
-						WriteEeprom(&readed, DCCData->data[1], 1);
-						DCC_ACK = 1;
-						Delay10KTCYx(10);
-						DCC_ACK = 0;
-					}	
-					else														//bit verify
-					{
-						if(((readed >> bitpos) & 0b00000001) == Bit)
-						{
-							DCC_ACK = 1;
-							Delay10KTCYx(10);
-							DCC_ACK = 0;
-						}
-					} 
-					break;
-				}
+				} 
+				break;
+			}
 		}
 		EnableServiceMode == 0;
 	}
