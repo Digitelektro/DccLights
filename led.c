@@ -3,6 +3,7 @@
 
 void LED_Init()
 {
+	/********************SPI Settings For LED controller********************/
 	TRISBbits.TRISB1 = 0;	//SCK output
 	TRISCbits.TRISC7 = 0;	//SDO output
 	TRISCbits.TRISC6 = 0;	//LAT output
@@ -11,12 +12,12 @@ void LED_Init()
 	SSPSTATbits.CKE = 0;
 	SSPCON1 = 0b00100010;	//SPI Master mode enable, clock is FOSC/64
 
-	//PWM Setting for 8 bit
+	/********************PWM Setting for 8 bit********************/
 	T2CON = 0;
 	T2CONbits.TMR2ON = 1;
 	PR2 = 0xFF;
 	CCPR2L = 0x16;
-	CCP2CON = 0x0C;	//PWM Mode ON
+	CCP2CON = 0x0C;			//PWM Mode ON
 	SetLed((unsigned int)0x0000);
 
 }

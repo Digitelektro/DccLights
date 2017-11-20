@@ -32,7 +32,7 @@ unsigned char Config[64];
 void DCC_Init()
 {
 	DCCLoadConfiguration();
-	DCC_ACK_TRIS = OUTPUT_PIN;  		//DCC Acknowledge pin
+	DCC_ACK_TRIS = OUTPUT_PIN;  //DCC Acknowledge pin
 	DCC_PIN_TRIS = INPUT_PIN;
 	DCC_ACK = 0;	
 	TRISBbits.TRISB2 = 0;
@@ -43,7 +43,7 @@ void DCC_Init()
 
 
 	T0CON = 0;
-	T0CONbits.T0PS1 = 1;		//Timer0 8 osztó
+	T0CONbits.T0PS1 = 1;		//Timer0 8 prescaler
 	T0CONbits.T08BIT = 1;		//Timer0 8bit mode
 	INTCONbits.TMR0IF = 0;		//Clear interrupt flag
 	INTCON2bits.TMR0IP = 1;		//Timer0 High Priority
@@ -93,7 +93,7 @@ void DCC_BitStartHandle()
 {
 	TMR0L = 150;			//75uS time
 	T0CONbits.TMR0ON = 1; 	//Timer0 enable
-	//LATAbits.LATA2 = 1;
+	//LATAbits.LATA2 = 1;	//Debug pin
 }
 #pragma tmpdata
 
@@ -101,7 +101,7 @@ void DCC_BitStartHandle()
 
 void DCC_BitHandle()
 {
-	//LATAbits.LATA2 = 0;
+	//LATAbits.LATA2 = 0;	//Debug pin
 	T0CONbits.TMR0ON = 0;	//Timer0 disable
 	if(DCC_PIN == 1)
 	{
@@ -224,7 +224,7 @@ void DCC_Command(DCC_REC *DCCData)
 					unsigned char bitpos = DCCData->data[2] & 0b00000111;
 					unsigned char Bit = (DCCData->data[2] & 0b00001000) >> 3;
 					ReadEeprom(&readed, DCCData->data[1], 1);
-					if(DCCData->data[2] & 0b00010000)	//bit write NOT TESTED yet!!!
+					if(DCCData->data[2] & 0b00010000)							//bit write NOT TESTED yet!!!
 					{
 						readed = readed & ~(1 << bitpos) | (Bit << bitpos);
 						WriteEeprom(&readed, DCCData->data[1], 1);
@@ -232,7 +232,7 @@ void DCC_Command(DCC_REC *DCCData)
 						Delay10KTCYx(10);
 						DCC_ACK = 0;
 					}	
-					else								//bit verify
+					else														//bit verify
 					{
 						if(((readed >> bitpos) & 0b00000001) == Bit)
 						{
@@ -269,7 +269,7 @@ void DCC_Command(DCC_REC *DCCData)
 					return;
 				if(DCCData->data[1] & 0b00011111 & DCC_ADVENCED_SPEED_COMMAND)	//Speed command
 				{
-					if(DCCData->data[2] & 0b10000000)	//Direction
+					if(DCCData->data[2] & 0b10000000)							//Direction command
 					{
 						DCC_SpeedCommdand(1, 0b01111111 & DCCData->data[2]);
 					}
@@ -285,7 +285,7 @@ void DCC_Command(DCC_REC *DCCData)
 			{
 				if(dcc_config.EngineeAddress != DCCData->data[0])
 					return;
-				if(DCCData->data[1] & DCC_DIRECTION_FORWARD_COMMAND)	//Forward?
+				if(DCCData->data[1] & DCC_DIRECTION_FORWARD_COMMAND)		//Forward?
 				{
 					DCC_SpeedCommdand(1, 0b00001111 & DCCData->data[2]);
 				}
@@ -388,7 +388,7 @@ void DCC_GroupOne(unsigned char Command)
 
 void DCC_GroupTwo(unsigned char Command)
 {
-	if(Command & 0b00010000) 	//F5-F8
+	if(Command & 0b00010000) 		//F5-F8 keys
 	{
 		if(Command & DDC_GROUP_ONE_F5)
 		{

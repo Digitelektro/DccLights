@@ -3,7 +3,7 @@
 
 
 /* --- configuration bits -------------------------------------------------- */
- #pragma config PLLDIV   = 6         // (24 MHz crystal on PICDEM FS USB board)
+ #pragma config PLLDIV   = 6         //24 MHz crystal 
  #pragma config CPUDIV   = OSC1_PLL2   
  #pragma config USBDIV   = 2         // Clock source from 96MHz PLL/2
  #pragma config FOSC     = HSPLL_HS
@@ -18,10 +18,10 @@
 #pragma config MCLRE    = ON
 #pragma config LPT1OSC  = OFF
 #pragma config PBADEN   = OFF
-#pragma config CCP2MX   = OFF	//Alternate CCP2 pin
+#pragma config CCP2MX   = OFF		//Alternate CCP2 pin
 #pragma config STVREN   = ON
 #pragma config LVP      = OFF
-//#pragma config ICPRT    = OFF       // Dedicated In-Circuit Debug/Programming
+//#pragma config ICPRT    = OFF     // Dedicated In-Circuit Debug/Programming
 #pragma config XINST    = OFF       // Extended Instruction Set
 #pragma config CP0      = OFF
 #pragma config CP1      = OFF
@@ -66,7 +66,7 @@ void WriteEeprom(unsigned char *Data, unsigned char Address, unsigned char Len);
 #define REMAPPED_RESET_VECTOR_ADDRESS			0x1400
 #define REMAPPED_HIGH_INTERRUPT_VECTOR_ADDRESS	0x1408
 #define REMAPPED_LOW_INTERRUPT_VECTOR_ADDRESS	0x1418
-extern void _startup (void);        // See c018i.c in your C18 compiler dir
+extern void _startup (void);        
 #pragma code REMAPPED_RESET_VECTOR = REMAPPED_RESET_VECTOR_ADDRESS
 void _reset (void)
 {
@@ -99,7 +99,7 @@ void Low_ISR (void)
 #pragma code
 
 
-//These are your actual interrupt handling routines.
+//Actual interrupt handling routines.
 #pragma interrupt YourHighPriorityISRCode
 void YourHighPriorityISRCode()
 {
@@ -134,18 +134,10 @@ extern unsigned int LedPattern;
 
 void main(void)	
 {
-	ADCON1 = 0x0F;	//Analog inputs as digital I/O
+	ADCON1 = 0x0F;				//Analog inputs as digital I/O
 	TRISA = 0;
 	TRISB = 0;
-
-
 	LED_Init();
-	/*
-	for(i = 0; i < 16; i++)
-	{
-		SetLed((unsigned int) 1 << i);
-		__delay_ms(50);
-	}*/
 	DCC_Init();
 	INTCONbits.PEIE = 1;		//Enable Periphal interrupt
 	INTCONbits.GIE = 1;			//Enable global interrupt
